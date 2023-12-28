@@ -1,4 +1,4 @@
-open! ParserM
+open ParserM
 
 module type ParserCombinatorSig = sig 
   include ParserMSig

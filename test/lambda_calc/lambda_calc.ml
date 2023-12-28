@@ -1,5 +1,8 @@
+open Sexplib.Std
+
 (* <variable> = 'a'-'z' ; ('a' - 'z' or 'A'-'Z' or '0' - '9')^* *)
 type variable = string
+[@@deriving sexp]
 
 (* <lambda-exppr> = 
       <variable> | lambda <variable> <lambda_expr> | <lambda_expr> <lambda_expr>
@@ -8,8 +11,16 @@ type lambda_expr =
     Variable of variable 
   | Lambda of variable * lambda_expr 
   | Application of lambda_expr * lambda_expr
+[@@deriving sexp]
 
 type tokens = LPAREN | RPAREN | LAMBDA | DOT | CHAR of char
+[@@deriving sexp]
+
+type ok_result = lambda_expr * tokens list [@@deriving sexp]
+type error_result = string [@@deriving sexp]
+let sexp_of_result = function 
+| Ok (x, y) -> sexp_of_ok_result (x, y)
+| Error err -> sexp_of_error_result err
 
 module Token = 
 struct 
@@ -74,6 +85,13 @@ and application () =
   let* _ = rparen in 
 
   return (Application (m, n))
+
+let%expect_test "variable name" = 
+  let expr = lambda_expr () [CHAR 'a'; CHAR 'b'] in 
+  let open Core in 
+  let sexp = sexp_of_result expr in 
+  print_endline (Sexp.to_string sexp);
+  [%expect {| ((Variable ab)()) |}]
 
 let lambda_calc () = 
   let () = match lambda_expr () [CHAR 'a'; CHAR 'b'] with 

@@ -5,7 +5,7 @@ type variable = string
 [@@deriving sexp]
 
 (* <lambda-exppr> = 
-      <variable> | lambda <variable> <lambda_expr> | <lambda_expr> <lambda_expr>
+      <variable> | lambda <variable> <lambda_expr> | ((<lambda_expr>) (<lambda_expr>))
    *)
 type lambda_expr = 
     Variable of variable 
@@ -44,7 +44,7 @@ let numeric : token parser_m = sat (check_char is_numeric)
 
 let alphanum = lowercase ++ uppercase ++ numeric
 
-let variable = 
+let variable_str = 
   let* first = lowercase in 
   let* rest = star alphanum in 
 
@@ -57,7 +57,8 @@ let variable =
   let b = Buffer.create 0 in 
   List.iter (Buffer.add_char b) chars;
 
-  return (Variable (Buffer.contents b))
+  return (Buffer.contents b)
+let variable = variable_str >>= Variable
 
 let lambda : token parser_m = sat (Token.equal LAMBDA) 
 let dot : token parser_m = sat (Token.equal DOT) 
@@ -67,12 +68,11 @@ let rparen : token parser_m = sat (Token.equal RPAREN)
 let rec lambda_expr ()  = variable ++ lambda_fn () ++ application ()
 and lambda_fn () = 
   let* _ = lambda in 
-  let* variable_name = variable in 
+  let* variable_name = variable_str in 
   let* _ = dot in 
   let* expr = lambda_expr () in 
-  match variable_name with 
-  | Variable v -> return (Lambda (v, expr))
-  | _ -> zero ~error:"this should be impossible"
+
+  return (Lambda (variable_name, expr))
 and application () = 
   let* _ = lparen in 
   let* _ = lparen in 

@@ -29,43 +29,38 @@ end
 module TokenParserCombinator = ParserCombinator.Make (ParserM.Make (Token))
 open TokenParserCombinator
 
-let check_char p = function CHAR c -> p c | _ -> false
+let char_of = function
+  | CHAR c -> return c
+  | _ -> zero ~error:"expecting char, received invalid token"
 
-let is_lowercase c =
-  Char.code 'a' <= Char.code c && Char.code c <= Char.code 'z'
+let in_range a b =
+  let* x = bind item char_of in
+  if Char.(code a <= code x && code x <= code b)
+  then return x
+  else zero ~error:(Printf.sprintf "char %c is not in range of [%c, %c]" x a b)
 
-let lowercase : token parser_m = sat (check_char is_lowercase)
-
-let is_uppercase c =
-  Char.code 'A' <= Char.code c && Char.code c <= Char.code 'Z'
-
-let uppercase : token parser_m = sat (check_char is_uppercase)
-let is_numeric c = Char.code '0' <= Char.code c && Char.code c <= Char.code '9'
-let numeric : token parser_m = sat (check_char is_numeric)
-let alphanum = any [lowercase; uppercase; numeric]
+let alphanum = any [in_range 'a' 'b'; in_range 'A' 'B'; in_range '0' '1']
 
 let variable_str =
-  let* first = lowercase in
+  let* first = (in_range 'a' 'b') in
   let* rest = star alphanum in
 
   let variable_name_list = first :: rest in
-  let get_chars = function
-    | CHAR c -> c
-    | _ -> failwith "all tokens should be CHARs"
-  in
-
-  let chars = List.map get_chars variable_name_list in
   let b = Buffer.create 0 in
-  List.iter (Buffer.add_char b) chars;
+  List.iter (Buffer.add_char b) variable_name_list;
 
   return (Buffer.contents b)
 
 let variable =
   let* v = variable_str in
   return (Variable v)
+
 let lambda : token parser_m = sat (Token.equal LAMBDA)
+
 let dot : token parser_m = sat (Token.equal DOT)
+
 let lparen : token parser_m = sat (Token.equal LPAREN)
+
 let rparen : token parser_m = sat (Token.equal RPAREN)
 
 let rec lambda_expr () = any [variable; lambda_fn (); application ()]

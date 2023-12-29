@@ -8,17 +8,17 @@ module type ParserCombinatorSig = sig
         in the list of parsers that can successfully parse the
         the tokens is returned *)
 
-  val ignore_fst : 'a parser_m -> 'a parser_m -> 'a parser_m
+  val ignore_fst : _ parser_m -> 'a parser_m -> 'a parser_m
   (** [ignore_fst] this function ensures that [ignore_fst p q] is a parser that
         ignores the result of parsing [p], and just parses the remaining
         tokens with q *)
 
-  val ignore_snd : 'a parser_m -> 'a parser_m -> 'a parser_m
+  val ignore_snd : 'a parser_m -> _ parser_m -> 'a parser_m
   (** [ignore_snd] this function ensures that [ignore_snd p q] is a parser that
         parses using p then q, but then ignores the result from q and just uses
         the result from p *)
 
-  val zero : error:string -> 'a parser_m
+  val zero : error:string -> _ parser_m
   (** [zero] is a parser that takes an error string and returns a parser that
         always errors out*)
 

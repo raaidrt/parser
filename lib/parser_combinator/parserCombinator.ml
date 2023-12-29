@@ -4,8 +4,8 @@ module type ParserCombinatorSig = sig
   include ParserMSig
 
   val any : 'a parser_m list -> 'a parser_m
-  val ignore_fst : 'a parser_m -> 'a parser_m -> 'a parser_m
-  val ignore_snd : 'a parser_m -> 'a parser_m -> 'a parser_m
+  val ignore_fst : _ parser_m -> 'a parser_m -> 'a parser_m
+  val ignore_snd : 'a parser_m -> _ parser_m -> 'a parser_m
   val zero : error:string -> 'a parser_m
   val item : token parser_m
   val star : 'a parser_m -> 'a list parser_m
@@ -27,13 +27,9 @@ module Make (Monad : ParserMSig) :
       | Ok _ as x -> x
       | Error _ -> any ps cs
 
-  let ignore_fst p q =
-    let* _ = p in
-    q
+  let ignore_fst p q = bind p (fun _ -> q)
 
-  let ignore_snd p q =
-    let* x = p in
-    ignore_fst q (return x)
+  let ignore_snd p q = bind p (fun x -> ignore_fst q (return x))
 
   let item = function
     | [] -> Error "expecting an item, got empty"

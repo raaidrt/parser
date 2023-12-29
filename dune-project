@@ -7,20 +7,18 @@
 (source
  (github username/reponame))
 
-(authors "Author Name")
+(authors "Raaid Tanveer")
 
-(maintainers "Maintainer Name")
+(maintainers "Raaid Tanveer")
 
 (license LICENSE)
 
-(documentation https://url/to/documentation)
-
 (package
  (name parser)
- (synopsis "A short synopsis")
- (description "A longer description")
+ (synopsis "A Monadic Parser Combinator")
+ (description "This is a Parser Combinator using a Parser Monad that abstracts on the type of Tokens.")
  (depends ocaml dune)
  (tags
-  (topics "to describe" your project)))
+  (parser combinator "functional programming" compilers lexing lexers)))
 
 ; See the complete stanza docs at https://dune.readthedocs.io/en/stable/dune-files.html#dune-project

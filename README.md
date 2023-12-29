@@ -31,6 +31,7 @@ The `bind` operator together with `return` forms a monad for the parser type, an
 we can perform some useful monadic comprehension like below:
 ```ocaml
 let star p = plus p ++ return []
+
 and plus p =
     let* x = p in
     let* xs = star p in

@@ -42,7 +42,7 @@ let is_uppercase c =
 let uppercase : token parser_m = sat (check_char is_uppercase)
 let is_numeric c = Char.code '0' <= Char.code c && Char.code c <= Char.code '9'
 let numeric : token parser_m = sat (check_char is_numeric)
-let alphanum = lowercase ++ uppercase ++ numeric
+let alphanum = any [lowercase; uppercase; numeric]
 
 let variable_str =
   let* first = lowercase in
@@ -68,7 +68,7 @@ let dot : token parser_m = sat (Token.equal DOT)
 let lparen : token parser_m = sat (Token.equal LPAREN)
 let rparen : token parser_m = sat (Token.equal RPAREN)
 
-let rec lambda_expr () = variable ++ lambda_fn () ++ application ()
+let rec lambda_expr () = any [variable; lambda_fn (); application ()]
 
 and lambda_fn () =
   let* _ = lambda in

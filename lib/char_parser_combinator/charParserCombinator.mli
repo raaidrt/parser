@@ -5,5 +5,6 @@ module CharParserCombinatorModule :
 
 include ParserCombinator.ParserCombinatorSig with type token = Char.t
 
-val ( % ) : 'a parser_m -> string -> ('a * token list, string) result
-(** [%] a function used for parsing a string *)
+val in_range : char -> char -> char parser_m
+(** [in_range a b] is a parser that consumes one [char] token and succeeds if
+    the token is within the range of [a] and [b] *)

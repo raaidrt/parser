@@ -3,9 +3,9 @@ open ParserM
 module type ParserCombinatorSig = sig
   include ParserMSig
 
-  val ( ++ ) : 'a parser_m -> 'a parser_m -> 'a parser_m
-  val ( >> ) : 'a parser_m -> 'a parser_m -> 'a parser_m
-  val ( << ) : 'a parser_m -> 'a parser_m -> 'a parser_m
+  val any : 'a parser_m list -> 'a parser_m
+  val ignore_fst : 'a parser_m -> 'a parser_m -> 'a parser_m
+  val ignore_snd : 'a parser_m -> 'a parser_m -> 'a parser_m
   val zero : error:string -> 'a parser_m
   val item : token parser_m
   val star : 'a parser_m -> 'a list parser_m
@@ -17,23 +17,29 @@ module Make (Monad : ParserMSig) :
   ParserCombinatorSig with type token = Monad.token = struct
   include Monad
 
-  let ( ++ ) p q cs = match p cs with Ok _ as x -> x | Error _ -> q cs
+  let zero ~error _ = Error error
 
-  let ( >> ) p q =
+  let rec any ps cs =
+    match ps with
+    | [] -> Error "no matches"
+    | p :: ps ->
+      match p cs with
+      | Ok _ as x -> x
+      | Error _ -> any ps cs
+
+  let ignore_fst p q =
     let* _ = p in
     q
 
-  let ( << ) p q =
+  let ignore_snd p q =
     let* x = p in
-    q >> return x
-
-  let zero ~error _ = Error error
+    ignore_fst q (return x)
 
   let item = function
     | [] -> Error "expecting an item, got empty"
     | c :: cs -> Ok (c, cs)
 
-  let rec star p = plus p ++ return []
+  let rec star p = any [plus p; return []]
 
   and plus p =
     let* x = p in

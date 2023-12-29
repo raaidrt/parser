@@ -33,14 +33,11 @@ struct
   | [] -> Error "expecting an item, got empty"
   | c :: cs -> Ok (c, cs)
 
-  let rec star p = 
-    (let* x = p in 
-    let* xs = star p in 
-    (return (x :: xs))) ++ (return [])
+  let rec star p = plus p ++ return []
 
-  let plus p = 
-    let* x = p in 
-    let* xs = star p in 
+  and plus p =
+    let* x = p in
+    let* xs = star p in
     return (x :: xs)
 
   let sat p ?error = item >>= function 

@@ -1,0 +1,3 @@
+(library
+ (name charParserCombinator)
+ (libraries parserM parserCombinator))

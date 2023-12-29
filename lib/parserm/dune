@@ -1,0 +1,3 @@
+(library
+ (name parserM)
+ (libraries core))

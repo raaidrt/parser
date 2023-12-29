@@ -41,13 +41,12 @@ module Make (Monad : ParserMSig) :
     return (x :: xs)
 
   let sat p ?error =
-    item >>= function
-    | x ->
+    bind item (fun x ->
         if p x then return x
         else
           zero
             ~error:
               (match error with
               | None -> "predicate does not match"
-              | Some error -> error)
+              | Some error -> error))
 end

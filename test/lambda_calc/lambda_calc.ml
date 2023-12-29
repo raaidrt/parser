@@ -39,10 +39,10 @@ let in_range a b =
   then return x
   else zero ~error:(Printf.sprintf "char %c is not in range of [%c, %c]" x a b)
 
-let alphanum = any [in_range 'a' 'b'; in_range 'A' 'B'; in_range '0' '1']
+let alphanum = any [in_range 'a' 'z'; in_range 'A' 'Z'; in_range '0' '9']
 
 let variable_str =
-  let* first = (in_range 'a' 'b') in
+  let* first = (in_range 'a' 'z') in
   let* rest = star alphanum in
 
   let variable_name_list = first :: rest in

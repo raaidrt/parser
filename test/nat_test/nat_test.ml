@@ -1,4 +1,5 @@
-open CharParserCombinator
+module NatParserCombinator = ParserCombinator.Make(ParserM.Make(Char))
+open NatParserCombinator
 
 let alphanum =
   sat

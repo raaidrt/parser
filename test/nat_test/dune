@@ -1,6 +1,6 @@
 (library
  (name nat_test)
- (libraries charParserCombinator)
+ (libraries parserCombinator parserM)
  (inline_tests)
  (preprocess
   (pps ppx_expect ppx_sexp_conv)))

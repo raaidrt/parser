@@ -1,9 +1,3 @@
-module type Distinguishable = sig
-  type t
-
-  val equal : t -> t -> bool
-end
-
 module type ParserMSig = sig
   (** [ParserM] is a signature for the parser monad
         @author Raaid Tanveer **)
@@ -27,4 +21,4 @@ module type ParserMSig = sig
         [Ok (x, cs)] where [cs] is the unconsumed list of tokens *)
 end
 
-module Make (Token : Distinguishable) : ParserMSig with type token = Token.t
+module Make (Token : Base.Equal.S) : ParserMSig with type token = Token.t

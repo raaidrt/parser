@@ -1,9 +1,3 @@
-module type Distinguishable = sig
-  type t
-
-  val equal : t -> t -> bool
-end
-
 module type ParserMSig = sig
   type token
   type 'a parser_m = token list -> ('a * token list, string) result
@@ -13,8 +7,7 @@ module type ParserMSig = sig
   val return : 'a -> 'a parser_m
 end
 
-module Make (Token : Distinguishable) : ParserMSig with type token = Token.t =
-struct
+module Make (Token : Base.Equal.S) : ParserMSig with type token = Token.t = struct
   type token = Token.t
   type 'a parser_m = token list -> ('a * token list, string) result
 
